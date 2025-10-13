@@ -5,22 +5,32 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": " vite",
     "build": "vite build",
     "preview": "vite preview"
   },
+  "imports": {
+    "#src/*": ["./src/*"]
+  },
   "dependencies": {
     "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "react-dom": "^19.2.0",
+    "@mdx-js/react": "3.1.1",
+    "@mdx-js/rollup": "3.1.1",
+    "renoun": "10.4.0",
+    "@renoun/mdx": "3.2.0",
+    "zod": "4.1.12",
+    "remark-frontmatter": "5.0.0",
+    "remark-mdx-frontmatter": "5.2.0"
   },
   "devDependencies": {
+    "tinyglobby": "0.2.15",
     "@mdx-js/rollup": "^3.1.1",
     "@types/node": "^24.7.2",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.1",
     "@vitejs/plugin-react": "latest",
     "@vitejs/plugin-rsc": "latest",
-    "tinyglobby": "^0.2.15",
     "rsc-html-stream": "^0.0.7",
     "vite": "^7.1.9"
   }

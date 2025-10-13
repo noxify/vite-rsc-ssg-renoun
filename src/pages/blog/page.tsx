@@ -1,4 +1,10 @@
-export default function BlogIndex() {
+// import { BlogPostDirectory } from "#src/collections.ts";
+
+export default async function BlogIndex() {
+
+    // const posts = await BlogPostDirectory.getEntries()
+
+    // console.dir({ posts }, { depth: null });
   return (
     <div>
       <h3>Blog Übersicht</h3>

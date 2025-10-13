@@ -10,10 +10,25 @@ import { type Plugin, type ResolvedConfig, defineConfig } from 'vite'
 import { RSC_POSTFIX, PAGES_DIR } from './src/framework/shared'
 import { collectStaticPaths } from './src/framework/utils'
 
+import rehypeAddCodeBlock from '@renoun/mdx/rehype/add-code-block'
+import remarkFrontmatter from 'remark-frontmatter'
+import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 export default defineConfig({
+  resolve: {
+    alias: {
+      "app-mdx-components": path.resolve(__dirname, "./src/mdx-components.tsx"),
+      "#src": path.resolve(__dirname, "./src"),
+
+    },
+  },
   plugins: [
     // inspect(),
-    mdx(),
+    mdx({
+      providerImportSource: 'app-mdx-components',
+      rehypePlugins: [rehypeAddCodeBlock],
+      remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
+    }),
+    // mdx(),
     react(),
     rsc({
       entries: {
@@ -24,6 +39,7 @@ export default defineConfig({
     }),
     rscSsgPlugin(),
   ],
+  
 })
 
 function rscSsgPlugin(): Plugin[] {

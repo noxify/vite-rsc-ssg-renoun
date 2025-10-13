@@ -61,12 +61,15 @@ export async function collectStaticPaths(
           path.dirname(file),
           "getStaticParams.ts"
         );
+
         const mod = await import(path.resolve(getStaticParamsPath));
         if (typeof mod.default === "function") {
           paramsList = await mod.default();
           found = true;
         }
-      } catch {}
+      } catch(e) {
+        console.error(e);
+      }
 
       if (!found) {
         throw new Error(

@@ -1,16 +1,16 @@
-// Liefert alle Blog-Slugs für SSG
+// import { BlogPostDirectory } from "#src/collections.ts";
+
 export default async function getStaticParams() {
-  // In der Praxis würdest du hier z.B. aus einer Datenbank oder API lesen
+
+  // const posts = await BlogPostDirectory.getEntries()
+
+  // const slugs = posts.map(post => ({ slug: post.getPathname() }));
+
+  // console.dir({ slugs }, { depth: null });
+  // return slugs
+
   return [
-    { slug: 'one' },
-    { slug: 'two' },
-    { slug: 'three' },
-    { slug: 'four' },
-    { slug: 'five' },
-    { slug: 'six' },
-    { slug: 'seven' },
-    { slug: 'eight' },
-    { slug: 'nine' },
-    { slug: 'ten' },
+    { slug: 'erste' },
+    { slug: 'zweite' },
   ];
 }
