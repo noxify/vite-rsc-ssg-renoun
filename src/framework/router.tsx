@@ -6,13 +6,19 @@ import * as React from "react";
  * @param path - The URL pathname (e.g. '/blog/hello')
  * @returns Array of path segments (e.g. ['blog', 'hello'])
  */
+/**
+ * Splits a URL pathname into its segments, ignoring group folders (e.g. (home), (foo)).
+ *
+ * @param path - The URL pathname (e.g. '/(home)/blog/hello')
+ * @returns Array of path segments (e.g. ['blog', 'hello'])
+ */
 function splitPath(path: string): string[] {
-  // '/' or '' => []
   if (!path || path === "/") return [];
   return path
     .replace(/^\/+|\/+$/g, "")
     .split("/")
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((seg) => !/^\(.+\)$/.test(seg)); // ignore group folders
 }
 
 /**
@@ -29,16 +35,17 @@ const pageModules = import.meta.glob("../pages/**/*.tsx", { eager: true });
  * @returns Array of imported layout modules (from root to leaf)
  */
 function collectLayouts(pathname: string) {
-  const segments = splitPath(pathname);
   const layouts: any[] = [];
   let current = "../pages";
   // Root layout
   if (pageModules[`${current}/layout.tsx`]) {
     layouts.push(pageModules[`${current}/layout.tsx`]);
   }
-  // Nested layouts
-  for (let i = 0; i < segments.length; i++) {
-    current += `/${segments[i]}`;
+  // Nested layouts (skip group folders)
+  let rawSegments = pathname.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean);
+  for (let i = 0; i < rawSegments.length; i++) {
+    if (/^\(.+\)$/.test(rawSegments[i])) continue; // skip group
+    current += `/${rawSegments[i]}`;
     if (pageModules[`${current}/layout.tsx`]) {
       layouts.push(pageModules[`${current}/layout.tsx`]);
     }

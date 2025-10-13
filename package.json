@@ -1,5 +1,5 @@
 {
-  "name": "@vitejs/plugin-rsc-examples-ssg",
+  "name": "vite-rsc-ssg-renoun",
   "version": "0.0.0",
   "private": true,
   "license": "MIT",
@@ -20,7 +20,7 @@
     "@types/react-dom": "^19.2.1",
     "@vitejs/plugin-react": "latest",
     "@vitejs/plugin-rsc": "latest",
-    "fast-glob": "^3.3.3",
+    "tinyglobby": "^0.2.15",
     "rsc-html-stream": "^0.0.7",
     "vite": "^7.1.9"
   }

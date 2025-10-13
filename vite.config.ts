@@ -63,7 +63,6 @@ async function renderStatic(config: ResolvedConfig) {
   // render rsc and html
   const baseDir = config.environments.client.build.outDir
   for (const staticPatch of staticPaths) {
-    config.logger.info('[vite-rsc:ssg] -> ' + staticPatch)
     const { html, rsc } = await entry.handleSsg(
       new Request(new URL(staticPatch, 'http://ssg.local')),
     )
@@ -73,6 +72,8 @@ async function renderStatic(config: ResolvedConfig) {
     )
     await writeFileStream(path.join(baseDir, staticPatch + RSC_POSTFIX), rsc)
   }
+
+  
 }
 
 async function writeFileStream(filePath: string, stream: ReadableStream) {
