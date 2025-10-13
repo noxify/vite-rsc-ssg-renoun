@@ -4,13 +4,20 @@ import { renderToReadableStream } from 'react-dom/server.edge'
 import { prerender } from 'react-dom/static.edge'
 import { injectRSCPayload } from 'rsc-html-stream/server'
 import type { RscPayload } from './shared'
-
+/**
+ * Server-side rendering (SSR) entrypoint for Vite RSC/SSR pipeline.
+ * Handles rendering of HTML streams from RSC payloads for both SSG and SSR.
+ *
+ * @param rscStream - The readable stream containing the RSC payload
+ * @param options - Optional options (e.g. ssg: true for static generation)
+ * @returns A readable stream of HTML (with injected RSC payload)
+ */
 export async function renderHtml(
   rscStream: ReadableStream<Uint8Array>,
   options?: {
     ssg?: boolean
   },
-) {
+): Promise<ReadableStream<Uint8Array>> {
   const [rscStream1, rscStream2] = rscStream.tee()
 
   let payload: Promise<RscPayload>

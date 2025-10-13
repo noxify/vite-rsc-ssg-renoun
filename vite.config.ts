@@ -6,8 +6,9 @@ import rsc from '@vitejs/plugin-rsc'
 import mdx from '@mdx-js/rollup'
 import react from '@vitejs/plugin-react'
 import { type Plugin, type ResolvedConfig, defineConfig } from 'vite'
-// import inspect from 'vite-plugin-inspect'
-import { RSC_POSTFIX } from './src/framework/shared'
+
+import { RSC_POSTFIX, PAGES_DIR } from './src/framework/shared'
+import { collectStaticPaths } from './src/framework/utils'
 
 export default defineConfig({
   plugins: [
@@ -56,8 +57,8 @@ async function renderStatic(config: ResolvedConfig) {
     pathToFileURL(entryPath).href
   )
 
-  // entry provides a list of static paths
-  const staticPaths = await entry.getStaticPaths()
+  // neue SSG-Path-Logik: sammle alle statischen Pfade
+  const staticPaths = await collectStaticPaths(PAGES_DIR)
 
   // render rsc and html
   const baseDir = config.environments.client.build.outDir
