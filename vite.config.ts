@@ -13,10 +13,12 @@ import remarkMdxFrontmatter from "remark-mdx-frontmatter"
 import tsconfigPaths from "vite-tsconfig-paths"
 
 import { RSC_POSTFIX } from "./src/framework/shared"
+import { printTreeView } from "./src/framework/utils"
 
 export default defineConfig({
+  logLevel: "warn",
   optimizeDeps: {
-    exclude: ["renoun", "ts-morph"],
+    exclude: ["renoun"],
   },
   resolve: {
     alias: {
@@ -66,6 +68,7 @@ function rscSsgPlugin(): Plugin[] {
       buildApp: {
         async handler(builder) {
           await renderStatic(builder.config)
+          console.log("RSC SSG: Static rendering complete.")
           process.exit(0)
         },
       },
@@ -85,7 +88,7 @@ async function renderStatic(config: ResolvedConfig) {
 
   // render rsc and html
   const baseDir = config.environments.client.build.outDir
-  for (const staticPatch of staticPaths) {
+  for (const staticPatch of staticPaths.generated) {
     const { html, rsc } = await entry.handleSsg(
       new Request(new URL(staticPatch, "http://ssg.local")),
     )
@@ -95,6 +98,8 @@ async function renderStatic(config: ResolvedConfig) {
     )
     await writeFileStream(path.join(baseDir, staticPatch + RSC_POSTFIX), rsc)
   }
+
+  console.log(printTreeView(staticPaths.tree, 5))
 }
 
 async function writeFileStream(filePath: string, stream: ReadableStream) {
