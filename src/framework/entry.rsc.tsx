@@ -7,17 +7,6 @@ import { filePathToRoutePattern } from "./utils"
 
 type MaybeAsync<T> = T | Promise<T>
 
-type StaticRouteEntry = {
-  /** Path to the page file (e.g. './blog/page.tsx') */
-  pagePath: string
-  /** Route pattern (e.g. '/blog', '/blog/[slug]') */
-  route: string
-  /** Imported page module (React component) */
-  module: unknown
-  /** Array of imported layout modules (React components) from root to leaf */
-  layouts: unknown[]
-}
-
 export async function getStaticRoutes() {
   const staticPathModules = import.meta.glob("/**/page.tsx", {
     eager: true,
@@ -55,10 +44,15 @@ export async function getStaticRoutes() {
       let finalPath = ""
       if (Array.isArray(p)) {
         // Catch-all: Array of segments
-        finalPath = [route.replace(/\[\.\.\..*?\]/, ""), ...p]
-          .join("/")
-          .replace(/\/+/g, "/")
-          .replace(/\/$/, "")
+        if (p.length === 0) {
+          // Empty array means index route
+          finalPath = route === "/" ? "/" : route.replace(/\/$/, "")
+        } else {
+          finalPath = [route.replace(/\[\.\.\..*?\]/, ""), ...p]
+            .join("/")
+            .replace(/\/+/g, "/")
+            .replace(/\/$/, "")
+        }
       } else if (p === "/" || p === "") {
         // Root or index
         finalPath = route === "/" ? "/" : route.replace(/\/$/, "")
@@ -132,7 +126,6 @@ export async function handleSsg(request: Request): Promise<{
   rsc: ReadableStream<Uint8Array>
 }> {
   const url = new URL(request.url)
-  console.dir({ url }, { depth: null })
   const rscPayload: RscPayload = { root: <AppRouter url={url} /> }
   const rscStream = renderToReadableStream<RscPayload>(rscPayload)
   const [rscStream1, rscStream2] = rscStream.tee()

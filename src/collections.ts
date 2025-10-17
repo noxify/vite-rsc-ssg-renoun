@@ -1,11 +1,10 @@
-import { Directory, withSchema } from 'renoun/file-system'
-import { z } from 'zod'
-
+import { Directory, withSchema } from "renoun/file-system"
+import { z } from "zod"
 
 export const BlogPostDirectory = new Directory({
-  path: 'posts',
-  filter: '*.mdx',
-  basePathname: null,
+  path: "content/posts",
+  filter: "*.mdx",
+  basePathname: "renoun",
   loader: {
     mdx: withSchema(
       {
@@ -13,11 +12,12 @@ export const BlogPostDirectory = new Directory({
           title: z.string(),
           date: z.coerce.date(),
           summary: z.string().optional(),
+          category: z.string(),
           tags: z.array(z.string()).optional(),
         }),
       },
-      (path) => import(`../posts/${path}.mdx`)
+      (path) => import(`../content/posts/${path}.mdx`),
     ),
   },
-  sort: 'frontmatter.date',
+  sort: "frontmatter.date",
 })

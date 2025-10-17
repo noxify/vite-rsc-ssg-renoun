@@ -5,8 +5,9 @@ export function getStaticPath() {
 export default function AboutPage() {
   return (
     <div>
-      <h2>About</h2>
-      <p>Dies ist die About-Seite mit eigenem Layout.</p>
+      <p>
+        This is the about page with shows also the nested layout functionality.
+      </p>
     </div>
   )
 }

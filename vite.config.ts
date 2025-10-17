@@ -5,6 +5,7 @@ import type { Plugin, ResolvedConfig } from "vite"
 import { defineConfig } from "vite"
 import mdx from "@mdx-js/rollup"
 import rehypeAddCodeBlock from "@renoun/mdx/rehype/add-code-block"
+import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import rsc from "@vitejs/plugin-rsc"
 import remarkFrontmatter from "remark-frontmatter"
@@ -14,6 +15,9 @@ import tsconfigPaths from "vite-tsconfig-paths"
 import { RSC_POSTFIX } from "./src/framework/shared"
 
 export default defineConfig({
+  optimizeDeps: {
+    exclude: ["renoun", "ts-morph"],
+  },
   resolve: {
     alias: {
       "mdx-components": path.resolve(
@@ -24,6 +28,7 @@ export default defineConfig({
   },
   plugins: [
     tsconfigPaths(),
+    tailwindcss(),
     // inspect(),
     mdx({
       providerImportSource: "mdx-components",
@@ -74,7 +79,7 @@ async function renderStatic(config: ResolvedConfig) {
     entryPath
   )
 
-  // // neue SSG-Path-Logik: sammle alle statischen Pfade
+  // get static paths from all pages based on their `getStaticPaths` export
   const staticPaths = await entry.getStaticRoutes()
 
   // render rsc and html

@@ -104,9 +104,12 @@ function collectLayouts(pathname: string) {
  * @returns The React element tree for the matched route (with layouts)
  */
 export function AppRouter({ url }: { url: URL }) {
-  const pathname = url.pathname
+  // Normalize pathname: remove trailing slash except for root
+  let pathname = url.pathname
+  if (pathname.length > 1 && pathname.endsWith("/")) {
+    pathname = pathname.slice(0, -1)
+  }
 
-  console.dir({ pathname }, { depth: null })
   /**
    * PageComponent expects optional params prop for dynamic/catch-all routes.
    */
@@ -137,13 +140,23 @@ export function AppRouter({ url }: { url: URL }) {
    * Finds the matching route entry for the current pathname.
    * First tries exact match, then dynamic/catch-all pattern match.
    */
-  let match = transformed.find((t) => t.route === pathname)
+  let match = transformed.find((t) => {
+    let route = t.route
+    if (route.length > 1 && route.endsWith("/")) {
+      route = route.slice(0, -1)
+    }
+    return route === pathname
+  })
   if (!match) {
     // Try dynamic and catch-all route patterns
     match = transformed.find((t) => {
+      let route = t.route
+      if (route.length > 1 && route.endsWith("/")) {
+        route = route.slice(0, -1)
+      }
       const pattern =
         "^" +
-        t.route
+        route
           .replace(/\[\.\.\.(\w+)\]/g, "(.+)")
           .replace(/\[(\w+)\]/g, "([^/]+)") +
         "$"

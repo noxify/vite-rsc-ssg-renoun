@@ -1,10 +1,19 @@
-import * as React from 'react';
+import * as React from "react"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-export default function AboutLayout({ children }: { children: React.ReactNode }) {
+export default function AboutLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <div style={{ border: '2px dashed #f90', padding: 16 }}>
-      <h2>About Layout</h2>
-      {children}
+    <div className="container mx-auto px-4 py-20 md:py-32">
+      <Card>
+        <CardHeader className="border-b">
+          <CardTitle>About us Layout</CardTitle>
+        </CardHeader>
+        <CardContent>{children}</CardContent>
+      </Card>
     </div>
-  );
+  )
 }
