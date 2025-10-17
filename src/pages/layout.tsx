@@ -11,7 +11,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <RootProvider>
+    <RootProvider languages={["ini", "tsx", "typescript", "ts", "js", "jsx"]}>
       <html lang="en">
         <head>
           <meta charSet="utf-8" />

@@ -14,13 +14,13 @@ export default function CatchAllPage({
       <p>Example to show a catchall route.</p>
       <ul>
         <li>
-          <a href="/catchall/level1">Catch all - one level</a>
+          <a href="/catchall/level1/">Catch all - one level</a>
         </li>
         <li>
-          <a href="/catchall/level1/level2">Catch all - two level</a>
+          <a href="/catchall/level1/level2/">Catch all - two level</a>
         </li>
         <li>
-          <a href="/catchall/level1/level2/level3">Catch all - three level</a>
+          <a href="/catchall/level1/level2/level3/">Catch all - three level</a>
         </li>
       </ul>
     </div>

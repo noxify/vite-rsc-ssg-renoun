@@ -63,7 +63,7 @@ export default async function BlogPost({
         <p className="text-lg leading-relaxed text-muted-foreground">
           Articles that mention "{params.slug.toLowerCase()}".{" "}
           <a
-            href={"/blog"}
+            href={"/blog/"}
             className="font-bold hover:text-secondary-foreground"
           >
             Browse all articles

@@ -33,7 +33,7 @@ export function BlogCard({
       </CardContent>
       <CardFooter>
         <a
-          href={`/blog/${slug}`}
+          href={`/blog/${slug}/`}
           className="inline-flex items-center gap-2 text-sm font-medium text-foreground transition-colors hover:text-accent"
         >
           Read more

@@ -33,7 +33,10 @@ export function useMDXComponents() {
     p: (props) => {
       return <p {...props} className="my-4 leading-relaxed" />
     },
+    // not working
     CodeBlock,
+    // Workaround to disable analysis in code blocks
+    // CodeBlock: (props) => <CodeBlock {...props} shouldAnalyze={false} />,
     CodeInline,
   } satisfies MDXComponents
 }

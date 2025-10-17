@@ -47,13 +47,13 @@ export default async function HomePage() {
           </p>
           <div className="flex flex-wrap gap-4">
             <Button asChild size="lg">
-              <a href="/blog">
+              <a href="/blog/">
                 Explore Articles
                 <ArrowRight className="ml-2" size={20} />
               </a>
             </Button>
             <Button asChild variant="outline" size="lg">
-              <a href="/about">About Me</a>
+              <a href="/about/">About Me</a>
             </Button>
           </div>
         </div>
@@ -64,7 +64,7 @@ export default async function HomePage() {
         <div className="mb-8 flex items-center justify-between">
           <h2 className="text-3xl font-bold">Latest Articles</h2>
           <Button asChild variant="ghost">
-            <a href="/blog" className="flex items-center gap-2">
+            <a href="/blog/" className="flex items-center gap-2">
               View all
               <ArrowRight size={16} />
             </a>

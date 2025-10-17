@@ -39,7 +39,7 @@ export default async function BlogPost({
   return (
     <div className="container mx-auto px-4 py-16">
       <Button asChild variant="ghost" className="mb-8">
-        <a href="/blog" className="flex items-center gap-2">
+        <a href="/blog/" className="flex items-center gap-2">
           <ArrowLeft size={16} />
           Back to articles
         </a>
@@ -73,7 +73,7 @@ export default async function BlogPost({
             <ul className="flex gap-2">
               {tags.map(({ label, slug }) => (
                 <li key={label} className="post__tag">
-                  <a href={`/tags/${slug}`}>
+                  <a href={`/tags/${slug}/`}>
                     <span className="rounded-md bg-secondary px-2 py-1 hover:bg-primary hover:text-primary-foreground">
                       {label}
                     </span>
