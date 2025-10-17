@@ -5,8 +5,8 @@
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": " renoun vite",
-    "build": "vite build",
+    "dev": " renoun vite dev",
+    "build": "renoun vite build",
     "preview": "tsx src/localserver.ts",
     "lint": "eslint --cache --cache-location .cache/.eslintcache",
     "lint:fix": "eslint --fix --cache --cache-location .cache/.eslintcache",

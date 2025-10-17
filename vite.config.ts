@@ -66,6 +66,7 @@ function rscSsgPlugin(): Plugin[] {
       buildApp: {
         async handler(builder) {
           await renderStatic(builder.config)
+          process.exit(0)
         },
       },
     },
