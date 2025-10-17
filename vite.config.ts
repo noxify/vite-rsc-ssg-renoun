@@ -1,30 +1,32 @@
-import fs from 'node:fs'
-import path from 'node:path'
-import { Readable } from 'node:stream'
-import { pathToFileURL } from 'node:url'
-import rsc from '@vitejs/plugin-rsc'
-import mdx from '@mdx-js/rollup'
-import react from '@vitejs/plugin-react'
-import { type Plugin, type ResolvedConfig, defineConfig } from 'vite'
+import fs from "node:fs"
+import path from "node:path"
+import { Readable } from "node:stream"
+import type { Plugin, ResolvedConfig } from "vite"
+import { defineConfig } from "vite"
+import mdx from "@mdx-js/rollup"
+import rehypeAddCodeBlock from "@renoun/mdx/rehype/add-code-block"
+import react from "@vitejs/plugin-react"
+import rsc from "@vitejs/plugin-rsc"
+import remarkFrontmatter from "remark-frontmatter"
+import remarkMdxFrontmatter from "remark-mdx-frontmatter"
+import tsconfigPaths from "vite-tsconfig-paths"
 
-import { RSC_POSTFIX, PAGES_DIR } from './src/framework/shared'
-import { collectStaticPaths } from './src/framework/utils'
+import { RSC_POSTFIX } from "./src/framework/shared"
 
-import rehypeAddCodeBlock from '@renoun/mdx/rehype/add-code-block'
-import remarkFrontmatter from 'remark-frontmatter'
-import remarkMdxFrontmatter from 'remark-mdx-frontmatter'
 export default defineConfig({
   resolve: {
     alias: {
-      "app-mdx-components": path.resolve(__dirname, "./src/mdx-components.tsx"),
-      "#src": path.resolve(__dirname, "./src"),
-
+      "mdx-components": path.resolve(
+        import.meta.dirname,
+        "./src/mdx-components.tsx",
+      ),
     },
   },
   plugins: [
+    tsconfigPaths(),
     // inspect(),
     mdx({
-      providerImportSource: 'app-mdx-components',
+      providerImportSource: "mdx-components",
       rehypePlugins: [rehypeAddCodeBlock],
       remarkPlugins: [remarkFrontmatter, remarkMdxFrontmatter],
     }),
@@ -32,25 +34,24 @@ export default defineConfig({
     react(),
     rsc({
       entries: {
-        client: './src/framework/entry.browser.tsx',
-        rsc: './src/framework/entry.rsc.tsx',
-        ssr: './src/framework/entry.ssr.tsx',
+        client: "./src/framework/entry.browser.tsx",
+        rsc: "./src/framework/entry.rsc.tsx",
+        ssr: "./src/framework/entry.ssr.tsx",
       },
     }),
     rscSsgPlugin(),
   ],
-  
 })
 
 function rscSsgPlugin(): Plugin[] {
   return [
     {
-      name: 'rsc-ssg',
+      name: "rsc-ssg",
       config: {
-        order: 'pre',
+        order: "pre",
         handler(_config, env) {
           return {
-            appType: env.isPreview ? 'mpa' : undefined,
+            appType: env.isPreview ? "mpa" : undefined,
             rsc: {
               serverHandler: env.isPreview ? false : undefined,
             },
@@ -68,19 +69,19 @@ function rscSsgPlugin(): Plugin[] {
 
 async function renderStatic(config: ResolvedConfig) {
   // import server entry
-  const entryPath = path.join(config.environments.rsc.build.outDir, 'index.js')
-  const entry: typeof import('./src/framework/entry.rsc') = await import(
-    pathToFileURL(entryPath).href
+  const entryPath = path.join(config.environments.rsc.build.outDir, "index.js")
+  const entry: typeof import("./src/framework/entry.rsc") = await import(
+    entryPath
   )
 
-  // neue SSG-Path-Logik: sammle alle statischen Pfade
-  const staticPaths = await collectStaticPaths(PAGES_DIR)
+  // // neue SSG-Path-Logik: sammle alle statischen Pfade
+  const staticPaths = await entry.getStaticRoutes()
 
   // render rsc and html
   const baseDir = config.environments.client.build.outDir
   for (const staticPatch of staticPaths) {
     const { html, rsc } = await entry.handleSsg(
-      new Request(new URL(staticPatch, 'http://ssg.local')),
+      new Request(new URL(staticPatch, "http://ssg.local")),
     )
     await writeFileStream(
       path.join(baseDir, normalizeHtmlFilePath(staticPatch)),
@@ -88,8 +89,6 @@ async function renderStatic(config: ResolvedConfig) {
     )
     await writeFileStream(path.join(baseDir, staticPatch + RSC_POSTFIX), rsc)
   }
-
-  
 }
 
 async function writeFileStream(filePath: string, stream: ReadableStream) {
@@ -98,8 +97,8 @@ async function writeFileStream(filePath: string, stream: ReadableStream) {
 }
 
 function normalizeHtmlFilePath(p: string) {
-  if (p.endsWith('/')) {
-    return p + 'index.html'
+  if (p.endsWith("/")) {
+    return p + "index.html"
   }
-  return p + '.html'
+  return p + ".html"
 }

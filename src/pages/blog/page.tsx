@@ -1,16 +1,18 @@
-// import { BlogPostDirectory } from "#src/collections.ts";
+export function getStaticPath() {
+  return ["blog"]
+}
 
 export default async function BlogIndex() {
-
-    // const posts = await BlogPostDirectory.getEntries()
-
-    // console.dir({ posts }, { depth: null });
   return (
     <div>
-      <h3>Blog Übersicht</h3>
+      <h3>Blog overview</h3>
       <ul>
-        <li><a href="/blog/erste">Erster Beitrag</a></li>
-        <li><a href="/blog/zweite">Zweiter Beitrag</a></li>
+        <li>
+          <a href="/blog/first">first blog entry</a>
+        </li>
+        <li>
+          <a href="/blog/second">second blog entry</a>
+        </li>
       </ul>
     </div>
   );

@@ -1,10 +1,6 @@
-import path from 'path'
 import { Directory, withSchema } from 'renoun/file-system'
 import { z } from 'zod'
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
 
-const __dirname = dirname(fileURLToPath(import.meta.url))
 
 export const BlogPostDirectory = new Directory({
   path: 'posts',
@@ -24,5 +20,4 @@ export const BlogPostDirectory = new Directory({
     ),
   },
   sort: 'frontmatter.date',
-  tsConfigPath: path.resolve(__dirname, '../tsconfig.json'),
 })

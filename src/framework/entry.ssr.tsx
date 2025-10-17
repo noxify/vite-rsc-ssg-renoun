@@ -4,6 +4,7 @@ import { renderToReadableStream } from 'react-dom/server.edge'
 import { prerender } from 'react-dom/static.edge'
 import { injectRSCPayload } from 'rsc-html-stream/server'
 import type { RscPayload } from './shared'
+
 /**
  * Server-side rendering (SSR) entrypoint for Vite RSC/SSR pipeline.
  * Handles rendering of HTML streams from RSC payloads for both SSG and SSR.

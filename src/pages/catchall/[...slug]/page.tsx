@@ -1,3 +1,11 @@
+export function getStaticPath() {
+  return [
+    ["level1"],
+    ["level1", "level2"],
+    ["level1", "level2", "level3"],
+  ]
+}
+
 export default function CatchAllPage({ params }: { params: { slug: string[] } }) {
   return (
     <div>

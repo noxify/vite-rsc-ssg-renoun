@@ -1,56 +1,99 @@
-import * as React from "react";
+import * as React from "react"
+
+import { filePathToRoutePattern } from "./utils"
 
 /**
- * Splits a URL pathname into its segments.
- *
- * @param path - The URL pathname (e.g. '/blog/hello')
- * @returns Array of path segments (e.g. ['blog', 'hello'])
+ * RouteEntry describes a single route, its pattern, page module, and layouts.
  */
-/**
- * Splits a URL pathname into its segments, ignoring group folders (e.g. (home), (foo)).
- *
- * @param path - The URL pathname (e.g. '/(home)/blog/hello')
- * @returns Array of path segments (e.g. ['blog', 'hello'])
- */
-function splitPath(path: string): string[] {
-  if (!path || path === "/") return [];
-  return path
-    .replace(/^\/+|\/+$/g, "")
-    .split("/")
-    .filter(Boolean)
-    .filter((seg) => !/^\(.+\)$/.test(seg)); // ignore group folders
+type RouteEntry = {
+  /** Path to the page file (e.g. './blog/page.tsx') */
+  pagePath: string
+  /** Route pattern (e.g. '/blog', '/blog/[slug]') */
+  route: string
+  /** Imported page module (React component) */
+  module: unknown
+  /** Array of imported layout modules (React components) from root to leaf */
+  layouts: unknown[]
 }
 
 /**
  * Eagerly imports all page and layout modules from the pages directory for routing.
- * The keys are relative paths (e.g. '../pages/blog/page.tsx').
+ * The keys are relative paths (e.g. './blog/page.tsx').
+ *
+ * pageModules: All page components (default export)
+ * layoutModules: All layout components (default export)
  */
-const pageModules = import.meta.glob("../pages/**/*.tsx", { eager: true });
+const pageModules = import.meta.glob("/**/page.tsx", {
+  eager: true,
+  base: "/src/pages/",
+  import: "default",
+})
+
+const layoutModules = import.meta.glob("/**/layout.tsx", {
+  eager: true,
+  base: "/src/pages/",
+  import: "default",
+})
 
 /**
- * Collects all layouts for a given pathname, from root to leaf.
- * This enables nested layouts similar to Next.js.
+ * Extracts route parameters from a route pattern and a pathname.
+ * Supports dynamic ([slug]) and catch-all ([...slug]) segments.
  *
- * @param pathname - The URL pathname (e.g. '/blog/hello')
+ * @param route - The route pattern (e.g. '/blog/[slug]', '/catchall/[...slug]')
+ * @param pathname - The actual URL pathname (e.g. '/blog/foo', '/catchall/a/b/c')
+ * @returns An object mapping param names to values (string for [slug], array for [...slug])
+ */
+function extractParams(
+  route: string,
+  pathname: string,
+): Record<string, string | string[]> {
+  const routeParts = route.split("/").filter(Boolean)
+  const pathParts = pathname.split("/").filter(Boolean)
+  const params: Record<string, string | string[]> = {}
+  routeParts.forEach((part: string, i: number) => {
+    if (part.startsWith("[...") && part.endsWith("]")) {
+      const key = part.slice(4, -1)
+      const arr = pathParts.slice(i)
+      params[key] = arr.length === 1 ? [arr[0]] : arr
+    } else if (part.startsWith("[") && part.endsWith("]")) {
+      const key = part.slice(1, -1)
+      params[key] = pathParts[i]
+    }
+  })
+  return params
+}
+
+/**
+ * Collects all layouts for a given route pattern, from root to leaf.
+ * Enables nested layouts similar to Next.js.
+ *
+ * @param pathname - The route pattern (e.g. '/blog/hello')
  * @returns Array of imported layout modules (from root to leaf)
  */
 function collectLayouts(pathname: string) {
-  const layouts: any[] = [];
-  let current = "../pages";
+  const layouts: any[] = []
+  let currentLayoutDir = "./"
   // Root layout
-  if (pageModules[`${current}/layout.tsx`]) {
-    layouts.push(pageModules[`${current}/layout.tsx`]);
+  if (layoutModules[`${currentLayoutDir}layout.tsx`]) {
+    layouts.push(layoutModules[`${currentLayoutDir}layout.tsx`])
   }
   // Nested layouts (skip group folders)
-  let rawSegments = pathname.replace(/^\/+|\/+$/g, "").split("/").filter(Boolean);
+  let rawSegments = pathname
+    .replace(/^\/+|\/+$/g, "")
+    .split("/")
+    .filter(Boolean)
   for (let i = 0; i < rawSegments.length; i++) {
-    if (/^\(.+\)$/.test(rawSegments[i])) continue; // skip group
-    current += `/${rawSegments[i]}`;
-    if (pageModules[`${current}/layout.tsx`]) {
-      layouts.push(pageModules[`${current}/layout.tsx`]);
+    if (/^\(.+\)$/.test(rawSegments[i])) continue // skip group
+    currentLayoutDir =
+      currentLayoutDir === "./"
+        ? `./${rawSegments[i]}/`
+        : `${currentLayoutDir}${rawSegments[i]}/`
+    const key = currentLayoutDir + "layout.tsx"
+    if (layoutModules[key]) {
+      layouts.push(layoutModules[key])
     }
   }
-  return layouts;
+  return layouts
 }
 
 /**
@@ -61,106 +104,69 @@ function collectLayouts(pathname: string) {
  * @returns The React element tree for the matched route (with layouts)
  */
 export function AppRouter({ url }: { url: URL }) {
-  const pathname = url.pathname;
-  const segments = splitPath(pathname);
-  let matchedModule: any = null;
-  let matchedType: "static" | "dynamic" | "catchall" | null = null;
-  let matchedParam: string | null = null;
-  let matchedCatchAll: string[] | null = null;
+  const pathname = url.pathname
 
-  // 1. Exact static match
-  let current = "../pages";
-  if (segments.length === 0 && pageModules["../pages/page.tsx"]) {
-    matchedModule = pageModules["../pages/page.tsx"];
-    matchedType = "static";
-  }
-  for (let i = 0; i < segments.length; i++) {
-    current += `/${segments[i]}`;
-  }
-  if (!matchedModule && pageModules[`${current}/page.tsx`]) {
-    matchedModule = pageModules[`${current}/page.tsx`];
-    matchedType = "static";
-  }
+  console.dir({ pathname }, { depth: null })
+  /**
+   * PageComponent expects optional params prop for dynamic/catch-all routes.
+   */
+  type PageComponent = React.ComponentType<{
+    params?: Record<string, string | string[]>
+  }>
+  /**
+   * LayoutComponent expects children prop for nested rendering.
+   */
+  type LayoutComponent = React.ComponentType<{ children: React.ReactNode }>
 
-  // 2. Dynamic route ([slug]) match
-  if (!matchedModule && segments.length > 0) {
-    const dynSegments = [...segments];
-    dynSegments[dynSegments.length - 1] = "[slug]";
-    const dynPath =
-      "../pages" + dynSegments.map((s) => `/${s}`).join("") + "/page.tsx";
-    
-    if (pageModules[dynPath]) {
-      matchedModule = pageModules[dynPath];
-      matchedType = "dynamic";
-      matchedParam = segments[segments.length - 1];
-    }
-  }
-
-  // 3. Catch-all ([...slug]) match
-  if (!matchedModule && segments.length > 0) {
-    for (let i = segments.length; i > 0; i--) {
-      const catchAllPath =
-        "../pages" +
-        segments
-          .slice(0, i - 1)
-          .map((s) => `/${s}`)
-          .join("") +
-        "/[...slug]/page.tsx";
-      
-      if (pageModules[catchAllPath]) {
-        matchedModule = pageModules[catchAllPath];
-        matchedType = "catchall";
-        matchedCatchAll = segments.slice(i - 1);
-        break;
+  /**
+   * transformed: Array of all routes with their page and layouts.
+   */
+  const transformed: RouteEntry[] = Object.entries(pageModules).map(
+    ([pagePath, pageContent]) => {
+      const route = filePathToRoutePattern(pagePath, "./")
+      return {
+        pagePath,
+        route,
+        module: pageContent,
+        layouts: collectLayouts(route),
       }
-    }
-  }
+    },
+  )
 
-  // 4. Fallback: parent static page (for index fallback)
-  if (!matchedModule && segments.length > 0) {
-    let parent = "../pages";
-    for (let i = 0; i < segments.length - 1; i++) {
-      parent += `/${segments[i]}`;
+  /**
+   * Finds the matching route entry for the current pathname.
+   * First tries exact match, then dynamic/catch-all pattern match.
+   */
+  let match = transformed.find((t) => t.route === pathname)
+  if (!match) {
+    // Try dynamic and catch-all route patterns
+    match = transformed.find((t) => {
+      const pattern =
+        "^" +
+        t.route
+          .replace(/\[\.\.\.(\w+)\]/g, "(.+)")
+          .replace(/\[(\w+)\]/g, "([^/]+)") +
+        "$"
+      return new RegExp(pattern).test(pathname)
+    })
+  }
+  /**
+   * If a match is found, extract params, render the page and wrap with layouts.
+   * Otherwise, render a simple Not Found message.
+   */
+  if (match) {
+    const params = extractParams(match.route, pathname)
+    const Page = match.module as PageComponent
+    let element = Object.keys(params).length ? (
+      <Page params={params} />
+    ) : (
+      <Page />
+    )
+    for (let i = match.layouts.length - 1; i >= 0; i--) {
+      const Layout = match.layouts[i] as LayoutComponent
+      element = <Layout>{element}</Layout>
     }
-    
-    if (pageModules[`${parent}/page.tsx`]) {
-      matchedModule = pageModules[`${parent}/page.tsx`];
-      matchedType = "static";
-    }
+    return element
   }
-
-  // 5. 404 catch-all
-  if (!matchedModule && pageModules["../pages/[...404].tsx"]) {
-    
-    matchedModule = pageModules["../pages/[...404].tsx"];
-    matchedType = null;
-  }
-
-  // Compose layouts and page
-  const layouts = collectLayouts(pathname);
-  let element = null;
-  if (
-    matchedModule &&
-    typeof matchedModule === "object" &&
-    matchedModule !== null &&
-    "default" in matchedModule &&
-    typeof (matchedModule as any).default === "function"
-  ) {
-    const Page = (matchedModule as { default: React.ComponentType<any> })
-      .default;
-    if (matchedType === "dynamic") {
-      element = <Page params={{ slug: matchedParam }} />;
-    } else if (matchedType === "catchall") {
-      element = <Page params={{ slug: matchedCatchAll }} />;
-    } else {
-      element = <Page />;
-    }
-  } else {
-    element = <p>Not found</p>;
-  }
-  for (let i = layouts.length - 1; i >= 0; i--) {
-    const Layout = layouts[i].default;
-    element = <Layout>{element}</Layout>;
-  }
-  return element;
+  return <p>Not found</p>
 }

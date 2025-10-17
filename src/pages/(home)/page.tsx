@@ -1,3 +1,8 @@
+
+export async function getStaticPath() { 
+  return ["/"];
+}
+
 export default function HomePage() {
   return (
     <div>
