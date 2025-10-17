@@ -36,7 +36,7 @@ export function useMDXComponents() {
     // not working
     CodeBlock,
     // Workaround to disable analysis in code blocks
-    // CodeBlock: (props) => <CodeBlock {...props} shouldAnalyze={false} />,
+    //CodeBlock: (props) => <CodeBlock {...props} shouldAnalyze={false} />,
     CodeInline,
   } satisfies MDXComponents
 }

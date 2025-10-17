@@ -37,15 +37,15 @@ export async function getStaticRoutes() {
   )
 
   const routes = new Set<string>()
+  const treeView: Record<string, string[]> = {}
 
   for (const entry of transformed) {
     const { route, staticPaths } = entry
+    const generated: string[] = []
     for (const p of staticPaths) {
       let finalPath = ""
       if (Array.isArray(p)) {
-        // Catch-all: Array of segments
         if (p.length === 0) {
-          // Empty array means index route
           finalPath = route === "/" ? "/" : route.replace(/\/$/, "")
         } else {
           finalPath = [route.replace(/\[\.\.\..*?\]/, ""), ...p]
@@ -54,24 +54,28 @@ export async function getStaticRoutes() {
             .replace(/\/$/, "")
         }
       } else if (p === "/" || p === "") {
-        // Root or index
         finalPath = route === "/" ? "/" : route.replace(/\/$/, "")
       } else {
-        // Static or dynamic route
         finalPath = [route.replace(/\[.*?\]/g, ""), p]
           .join("/")
           .replace(/\/+/g, "/")
           .replace(/\/$/, "")
       }
-      // Ensure trailing slash except for root
       if (finalPath !== "/" && !finalPath.endsWith("/")) {
         finalPath += "/"
       }
       routes.add(finalPath)
+      if (route.includes("[") && route.includes("]")) {
+        generated.push(finalPath)
+      }
     }
+    treeView[route] = route.includes("[") ? generated : []
   }
 
-  return Array.from(routes)
+  return {
+    generated: Array.from(routes),
+    tree: treeView,
+  }
 }
 
 /**
