@@ -4,7 +4,7 @@ import { z } from "zod"
 export const BlogPostDirectory = new Directory({
   path: "content/posts",
   filter: "*.mdx",
-  basePathname: "renoun",
+  basePathname: "blog",
   loader: {
     mdx: withSchema(
       {
