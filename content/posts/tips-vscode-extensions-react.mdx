@@ -17,19 +17,18 @@ Visual Studio Code has become the go-to editor for React developers, and the rig
 This extension provides a collection of snippets for React, Redux, and React Native development.
 
 **Key snippets:**
+
 - `rafce` → React Arrow Function Component with Export
-- `useState` → useState Hook snippet  
+- `useState` → useState Hook snippet
 - `useEffect` → useEffect Hook snippet
 - `redux` → Redux action and reducer snippets
 
 ```tsx
 // Type 'rafce' and press Tab
-import React from 'react'
+import React from "react"
 
 const ComponentName = () => {
-  return (
-    <div>ComponentName</div>
-  )
+  return <div>ComponentName</div>
 }
 
 export default ComponentName
@@ -53,6 +52,7 @@ Colors matching brackets to make code more readable (now built into VS Code nati
 ## 4. GitLens
 
 Provides advanced Git capabilities directly in your editor:
+
 - Blame annotations
 - Code lens showing recent changes
 - Interactive rebase editor
@@ -106,12 +106,13 @@ Automatically finds, parses and provides code actions for all available imports.
 ## 9. Tailwind CSS IntelliSense
 
 If you're using Tailwind CSS with React, this extension provides:
+
 - Autocomplete for class names
 - CSS preview on hover
 - Syntax highlighting
 
 ```jsx
-<div className="flex items-center justify-between p-4 bg-gray-100 rounded-lg">
+<div className="flex items-center justify-between rounded-lg bg-gray-100 p-4">
   {/* IntelliSense will suggest and preview these classes */}
 </div>
 ```
@@ -128,12 +129,14 @@ While not a VS Code extension, this browser extension is essential for debugging
 ## Pro Tips for Maximum Productivity
 
 **Keyboard Shortcuts:**
+
 - `Ctrl+Shift+P` (Cmd+Shift+P on Mac) - Command Palette
 - `Ctrl+P` (Cmd+P) - Quick File Open
 - `F2` - Rename Symbol
 - `Alt+Shift+F` - Format Document
 
 **Workspace Settings:**
+
 ```json
 {
   "editor.formatOnSave": true,

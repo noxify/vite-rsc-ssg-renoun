@@ -1,3 +1,4 @@
+import type { PageProps } from "@/routes"
 import { BlogPostDirectory } from "@/collections"
 import { BlogCard } from "@/components/blog-card"
 
@@ -22,7 +23,7 @@ const getTags = async () => {
   return [...new Set(tags)]
 }
 
-const getData = async (slug: string) => {
+const getData = async (slug: PageProps<"/tags/[slug]">["params"]["slug"]) => {
   const postEntries = await BlogPostDirectory.getEntries()
 
   const formatter = new Intl.DateTimeFormat("en-US", {
@@ -36,7 +37,7 @@ const getData = async (slug: string) => {
       return {
         slug: entry.getPathnameSegments().slice(1).join("/"),
         title: frontmatter.title,
-        excerpt: frontmatter.summary || "",
+        excerpt: frontmatter.summary ?? "",
         date: formatter.format(frontmatter.date),
         category: frontmatter.category,
         raw: frontmatter,
@@ -47,11 +48,7 @@ const getData = async (slug: string) => {
   return posts.filter((post) => post.raw.tags?.includes(slug))
 }
 
-export default async function BlogPost({
-  params,
-}: {
-  params: { slug: string }
-}) {
+export default async function BlogPost({ params }: PageProps<"/tags/[slug]">) {
   const posts = await getData(params.slug)
   return (
     <div className="container mx-auto px-4 py-16">

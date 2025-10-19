@@ -5,7 +5,13 @@ import { AppRouter } from "./router"
 import { RSC_POSTFIX } from "./shared"
 import { filePathToRoutePattern, fillDynamicRoute } from "./utils"
 
-type MaybeAsync<T> = T | Promise<T>
+function isPromise<T>(value: unknown): value is Promise<T> {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    typeof (value as Promise<T>).then === "function"
+  )
+}
 
 /**
  * Generates static routes by processing dynamic route patterns and their corresponding static paths.
@@ -35,22 +41,26 @@ export async function getStaticRoutes() {
     eager: true,
     base: "/src/pages/",
     import: "getStaticPath",
-  }) as Record<string, MaybeAsync<() => Array<Record<string, any>>>>
+  })
 
   const transformed = await Promise.all(
     Object.entries(staticPathModules).map(async ([pagePath, staticPaths]) => {
       const route = filePathToRoutePattern(pagePath, "./")
-      let staticPathsFn: (() => Array<Record<string, any>>) | undefined
+      type StaticPathObject = Record<string, string | string[]>
+      type StaticPathFn = () => StaticPathObject[] | Promise<StaticPathObject[]>
+      let staticPathsFn: StaticPathFn | undefined
+
       if (typeof staticPaths === "function") {
-        staticPathsFn = staticPaths
-      } else if (staticPaths && typeof staticPaths.then === "function") {
-        // staticPaths is a Promise
+        staticPathsFn = staticPaths as StaticPathFn
+      } else if (isPromise(staticPaths)) {
         const resolved = await staticPaths
         if (typeof resolved === "function") {
-          staticPathsFn = resolved
+          staticPathsFn = resolved as StaticPathFn
         }
       }
-      const paths = staticPathsFn ? await staticPathsFn() : []
+      const paths: StaticPathObject[] = staticPathsFn
+        ? await staticPathsFn()
+        : []
       return {
         pagePath,
         route,
@@ -67,6 +77,7 @@ export async function getStaticRoutes() {
     const generated: string[] = []
     for (const p of staticPaths) {
       let finalPath = ""
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       if (typeof p === "object" && p !== null) {
         finalPath = fillDynamicRoute(route, p)
       } else if (p === "/" || p === "") {
@@ -101,7 +112,7 @@ export async function getStaticRoutes() {
  * @returns A Response containing either the RSC stream or the HTML stream
  */
 export default async function handler(request: Request): Promise<Response> {
-  let url = new URL(request.url)
+  const url = new URL(request.url)
   let isRscRequest = false
   if (url.pathname.endsWith(RSC_POSTFIX)) {
     isRscRequest = true
@@ -122,6 +133,7 @@ export default async function handler(request: Request): Promise<Response> {
 
   // SSR HTML rendering
   const ssr = await import.meta.viteRsc.loadModule<
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     typeof import("./entry.ssr")
   >("ssr", "index")
   const htmlStream = await ssr.renderHtml(rscStream)
@@ -150,6 +162,7 @@ export async function handleSsg(request: Request): Promise<{
   const [rscStream1, rscStream2] = rscStream.tee()
 
   const ssr = await import.meta.viteRsc.loadModule<
+    // eslint-disable-next-line @typescript-eslint/consistent-type-imports
     typeof import("./entry.ssr")
   >("ssr", "index")
   const htmlStream = await ssr.renderHtml(rscStream1, {

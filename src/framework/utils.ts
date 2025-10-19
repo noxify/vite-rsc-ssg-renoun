@@ -32,7 +32,7 @@ export function filePathToRoutePattern(
   path = path.replace(/\/page\.(js|ts|jsx|tsx)$/, "")
 
   // Empty path becomes "/"
-  let pattern = path === "" ? "/" : `/${path}`
+  const pattern = path === "" ? "/" : `/${path}`
   return pattern
 }
 
@@ -57,30 +57,34 @@ export function filePathToRoutePattern(
  * // Returns: "/docs/api/users/create"
  * ```
  */
-export function fillDynamicRoute(
+export function fillDynamicRoute<T extends Record<string, string | string[]>>(
   route: string,
-  params: Record<string, any>,
+  params: T,
 ): string {
-  return route.replace(/\[(\.\.\.[^\]]+|[^\]]+)\]/g, (_match, paramName) => {
-    if (paramName.startsWith("...")) {
-      // Catch-all: join all segments in array
-      const key = paramName.slice(3)
-      const value = params[key]
-      return Array.isArray(value) ? value.join("/") : (value ?? "")
-    }
-    return params[paramName] ?? ""
-  })
+  return route.replace(
+    /\[(\.\.\.[^\]]+|[^\]]+)\]/g,
+    (_match, paramName: string) => {
+      if (paramName.startsWith("...")) {
+        const key = paramName.slice(3)
+        const value = params[key]
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        return Array.isArray(value) ? value.join("/") : String(value ?? "")
+      }
+      return String(params[paramName] ?? "")
+    },
+  )
 }
 
 type TreeView = Record<string, string[]>
 
-export function printTreeView(tree: TreeView, maxChildren: number = 3): void {
+export function printTreeView(tree: TreeView, maxChildren = 3): void {
   const keys = Object.keys(tree)
   keys.forEach((key, idx) => {
     const isLast = idx === keys.length - 1
     const prefix = idx === 0 ? " ┌" : isLast ? " └" : " ├"
     console.log(`${prefix} ${key}`)
     const children = tree[key]
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (children && children.length > 0) {
       const showCount = Math.min(children.length, maxChildren)
       const childIndent = isLast ? "    " : " │   "

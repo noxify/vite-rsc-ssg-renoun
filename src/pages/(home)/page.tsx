@@ -3,7 +3,7 @@ import { BlogCard } from "@/components/blog-card"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 
-export async function getStaticPath() {
+export function getStaticPath() {
   return ["/"]
 }
 
@@ -21,7 +21,7 @@ const getData = async () => {
       return {
         slug: entry.getPathnameSegments().slice(1).join("/"),
         title: frontmatter.title,
-        excerpt: frontmatter.summary || "",
+        excerpt: frontmatter.summary ?? "",
         date: formatter.format(frontmatter.date),
         category: frontmatter.category,
         raw: frontmatter,

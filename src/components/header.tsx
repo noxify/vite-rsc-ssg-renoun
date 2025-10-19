@@ -4,7 +4,10 @@ import { useState } from "react"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { Menu, X } from "lucide-react"
 
-type NavItem = { href: string; label: string }
+interface NavItem {
+  href: string
+  label: string
+}
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)

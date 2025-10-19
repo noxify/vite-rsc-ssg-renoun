@@ -19,7 +19,7 @@ const getData = async () => {
       return {
         slug: entry.getPathnameSegments().slice(1).join("/"),
         title: frontmatter.title,
-        excerpt: frontmatter.summary || "",
+        excerpt: frontmatter.summary ?? "",
         date: formatter.format(frontmatter.date),
         category: frontmatter.category,
         raw: frontmatter,

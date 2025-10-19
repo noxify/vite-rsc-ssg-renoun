@@ -35,7 +35,7 @@ export default function RouteTypesPlugin(): Plugin {
         .filter(Boolean)
         .join("\n:")
       const typeDef = `// AUTO-GENERATED FILE\nexport type PageProps<T extends string> =\n${branches}\n: never;\n`
-      fs.writeFileSync(path.join(process.cwd(), "src/routes.types.ts"), typeDef)
+      fs.writeFileSync(path.join(process.cwd(), "types/routes.d.ts"), typeDef)
       // console.log("Route types generated in src/routes.types.ts")
     },
   }

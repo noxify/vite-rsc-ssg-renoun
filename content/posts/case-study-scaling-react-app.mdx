@@ -16,6 +16,7 @@ When our React application suddenly grew from 100 daily active users to 10,000+ 
 ## Initial Application State
 
 **Before Scaling:**
+
 - Single React SPA with client-side routing
 - All components loaded upfront
 - Basic state management with React Context
@@ -24,6 +25,7 @@ When our React application suddenly grew from 100 daily active users to 10,000+ 
 - Monolithic API calls
 
 **Performance Metrics (100 users):**
+
 - First Contentful Paint: 2.1s
 - Largest Contentful Paint: 3.8s
 - Bundle size: 1.2MB
@@ -32,6 +34,7 @@ When our React application suddenly grew from 100 daily active users to 10,000+ 
 ## The Growth Challenge
 
 As user numbers increased, we experienced:
+
 - Slow page load times (8+ seconds)
 - High bounce rates (65%)
 - Server overload during peak hours
@@ -46,39 +49,49 @@ As user numbers increased, we experienced:
 
 ```tsx
 // Before: Single large bundle
-import Dashboard from './pages/Dashboard';
-import UserProfile from './pages/UserProfile';
-import Reports from './pages/Reports';
 
 // After: Lazy-loaded components
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense } from "react"
 
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const UserProfile = lazy(() => import('./pages/UserProfile'));
-const Reports = lazy(() => import('./pages/Reports'));
+import Dashboard from "./pages/Dashboard"
+import Reports from "./pages/Reports"
+import UserProfile from "./pages/UserProfile"
+
+const Dashboard = lazy(() => import("./pages/Dashboard"))
+const UserProfile = lazy(() => import("./pages/UserProfile"))
+const Reports = lazy(() => import("./pages/Reports"))
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/dashboard" element={
-          <Suspense fallback={<PageSkeleton />}>
-            <Dashboard />
-          </Suspense>
-        } />
-        <Route path="/profile" element={
-          <Suspense fallback={<PageSkeleton />}>
-            <UserProfile />
-          </Suspense>
-        } />
-        <Route path="/reports" element={
-          <Suspense fallback={<PageSkeleton />}>
-            <Reports />
-          </Suspense>
-        } />
+        <Route
+          path="/dashboard"
+          element={
+            <Suspense fallback={<PageSkeleton />}>
+              <Dashboard />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <Suspense fallback={<PageSkeleton />}>
+              <UserProfile />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <Suspense fallback={<PageSkeleton />}>
+              <Reports />
+            </Suspense>
+          }
+        />
       </Routes>
     </Router>
-  );
+  )
 }
 ```
 
@@ -90,11 +103,10 @@ function App() {
 
 // After: Selective imports and replacements
 // Replace moment.js with date-fns
-import { format, parseISO } from 'date-fns';
-
+import { format, parseISO } from "date-fns"
 // Replace lodash with selective imports
-import debounce from 'lodash/debounce';
-import throttle from 'lodash/throttle';
+import debounce from "lodash/debounce"
+import throttle from "lodash/throttle"
 
 // Tree-shaking optimization in vite.config.ts
 export default defineConfig({
@@ -102,14 +114,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['react', 'react-dom'],
-          utils: ['date-fns', 'lodash'],
-          charts: ['recharts', 'd3'],
+          vendor: ["react", "react-dom"],
+          utils: ["date-fns", "lodash"],
+          charts: ["recharts", "d3"],
         },
       },
     },
   },
-});
+})
 ```
 
 ### Phase 2: Image and Asset Optimization (Week 3)
@@ -126,12 +138,12 @@ interface OptimizedImageProps {
   className?: string;
 }
 
-function OptimizedImage({ 
-  src, 
-  alt, 
-  width, 
-  height, 
-  className 
+function OptimizedImage({
+  src,
+  alt,
+  width,
+  height,
+  className
 }: OptimizedImageProps) {
   const [imageSrc, setImageSrc] = useState('');
   const [isLoaded, setIsLoaded] = useState(false);
@@ -148,7 +160,7 @@ function OptimizedImage({
   return (
     <div className={`image-container ${className}`}>
       {!isLoaded && (
-        <div 
+        <div
           className="image-skeleton"
           style={{ width, height }}
         />
@@ -193,21 +205,21 @@ function OptimizedImage({
 
 ```javascript
 // Image optimization during build
-import imagemin from 'imagemin';
-import imageminWebp from 'imagemin-webp';
-import imageminPngquant from 'imagemin-pngquant';
-import imageminMozjpeg from 'imagemin-mozjpeg';
+import imagemin from "imagemin"
+import imageminMozjpeg from "imagemin-mozjpeg"
+import imageminPngquant from "imagemin-pngquant"
+import imageminWebp from "imagemin-webp"
 
 const optimizeImages = async () => {
-  await imagemin(['src/assets/images/*.{jpg,png}'], {
-    destination: 'dist/images',
+  await imagemin(["src/assets/images/*.{jpg,png}"], {
+    destination: "dist/images",
     plugins: [
       imageminWebp({ quality: 75 }),
       imageminPngquant({ quality: [0.6, 0.8] }),
       imageminMozjpeg({ quality: 75 }),
     ],
-  });
-};
+  })
+}
 ```
 
 ### Phase 3: State Management Optimization (Week 4-5)
@@ -216,22 +228,22 @@ const optimizeImages = async () => {
 
 ```typescript
 // Efficient state management with Zustand
-import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
-import { immer } from 'zustand/middleware/immer';
+import { create } from "zustand"
+import { createJSONStorage, persist } from "zustand/middleware"
+import { immer } from "zustand/middleware/immer"
 
 interface UserState {
-  user: User | null;
-  preferences: UserPreferences;
+  user: User | null
+  preferences: UserPreferences
   cache: {
-    dashboard: DashboardData | null;
-    reports: ReportsData | null;
-  };
-  
-  setUser: (user: User) => void;
-  updatePreferences: (preferences: Partial<UserPreferences>) => void;
-  setCacheData: (key: keyof UserState['cache'], data: any) => void;
-  clearCache: () => void;
+    dashboard: DashboardData | null
+    reports: ReportsData | null
+  }
+
+  setUser: (user: User) => void
+  updatePreferences: (preferences: Partial<UserPreferences>) => void
+  setCacheData: (key: keyof UserState["cache"], data: any) => void
+  clearCache: () => void
 }
 
 export const useUserStore = create<UserState>()(
@@ -243,87 +255,91 @@ export const useUserStore = create<UserState>()(
         dashboard: null,
         reports: null,
       },
-      
-      setUser: (user) => set((state) => {
-        state.user = user;
-      }),
-      
-      updatePreferences: (preferences) => set((state) => {
-        Object.assign(state.preferences, preferences);
-      }),
-      
-      setCacheData: (key, data) => set((state) => {
-        state.cache[key] = data;
-      }),
-      
-      clearCache: () => set((state) => {
-        state.cache = { dashboard: null, reports: null };
-      }),
+
+      setUser: (user) =>
+        set((state) => {
+          state.user = user
+        }),
+
+      updatePreferences: (preferences) =>
+        set((state) => {
+          Object.assign(state.preferences, preferences)
+        }),
+
+      setCacheData: (key, data) =>
+        set((state) => {
+          state.cache[key] = data
+        }),
+
+      clearCache: () =>
+        set((state) => {
+          state.cache = { dashboard: null, reports: null }
+        }),
     })),
     {
-      name: 'user-storage',
+      name: "user-storage",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         user: state.user,
         preferences: state.preferences,
         // Don't persist cache to avoid stale data
       }),
-    }
-  )
-);
+    },
+  ),
+)
 ```
 
 **React Query for Server State:**
 
 ```tsx
 // Efficient data fetching with caching
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 // Custom hook for dashboard data
 export function useDashboardData() {
   return useQuery({
-    queryKey: ['dashboard'],
-    queryFn: () => apiClient.get('/dashboard'),
+    queryKey: ["dashboard"],
+    queryFn: () => apiClient.get("/dashboard"),
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
-  });
+  })
 }
 
 // Optimistic updates for better UX
 export function useUpdateUserProfile() {
-  const queryClient = useQueryClient();
-  
+  const queryClient = useQueryClient()
+
   return useMutation({
-    mutationFn: (userData: Partial<User>) => 
-      apiClient.put('/user/profile', userData),
-    
+    mutationFn: (userData: Partial<User>) =>
+      apiClient.put("/user/profile", userData),
+
     onMutate: async (newUserData) => {
       // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: ['user'] });
-      
+      await queryClient.cancelQueries({ queryKey: ["user"] })
+
       // Snapshot previous value
-      const previousUser = queryClient.getQueryData(['user']);
-      
+      const previousUser = queryClient.getQueryData(["user"])
+
       // Optimistically update cache
-      queryClient.setQueryData(['user'], (old: User) => ({
+      queryClient.setQueryData(["user"], (old: User) => ({
         ...old,
         ...newUserData,
-      }));
-      
-      return { previousUser };
+      }))
+
+      return { previousUser }
     },
-    
+
     onError: (err, newUserData, context) => {
       // Rollback on error
-      queryClient.setQueryData(['user'], context?.previousUser);
+      queryClient.setQueryData(["user"], context?.previousUser)
     },
-    
+
     onSettled: () => {
       // Refetch after mutation
-      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ["user"] })
     },
-  });
+  })
 }
 ```
 
@@ -333,29 +349,29 @@ export function useUpdateUserProfile() {
 
 ```tsx
 // Performance monitoring component
-import { getCLS, getFID, getFCP, getLCP, getTTFB } from 'web-vitals';
+import { getCLS, getFCP, getFID, getLCP, getTTFB } from "web-vitals"
 
 function PerformanceMonitor() {
   useEffect(() => {
     // Collect and send performance metrics
     const sendMetric = (metric: any) => {
       // Send to analytics service
-      analytics.track('performance_metric', {
+      analytics.track("performance_metric", {
         name: metric.name,
         value: metric.value,
         id: metric.id,
         url: window.location.pathname,
-      });
-    };
+      })
+    }
 
-    getCLS(sendMetric);
-    getFID(sendMetric);
-    getFCP(sendMetric);
-    getLCP(sendMetric);
-    getTTFB(sendMetric);
-  }, []);
+    getCLS(sendMetric)
+    getFID(sendMetric)
+    getFCP(sendMetric)
+    getLCP(sendMetric)
+    getTTFB(sendMetric)
+  }, [])
 
-  return null;
+  return null
 }
 
 // Usage in App component
@@ -365,7 +381,7 @@ function App() {
       <PerformanceMonitor />
       {/* Rest of app */}
     </>
-  );
+  )
 }
 ```
 
@@ -373,8 +389,8 @@ function App() {
 
 ```tsx
 interface ErrorBoundaryState {
-  hasError: boolean;
-  error: Error | null;
+  hasError: boolean
+  error: Error | null
 }
 
 class ErrorBoundary extends Component<
@@ -382,25 +398,25 @@ class ErrorBoundary extends Component<
   ErrorBoundaryState
 > {
   constructor(props: PropsWithChildren<{}>) {
-    super(props);
-    this.state = { hasError: false, error: null };
+    super(props)
+    this.state = { hasError: false, error: null }
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
-    return { hasError: true, error };
+    return { hasError: true, error }
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     // Log error to monitoring service
-    console.error('Error caught by boundary:', error, errorInfo);
-    
+    console.error("Error caught by boundary:", error, errorInfo)
+
     // Send to error tracking
-    analytics.track('javascript_error', {
+    analytics.track("javascript_error", {
       message: error.message,
       stack: error.stack,
       componentStack: errorInfo.componentStack,
       url: window.location.pathname,
-    });
+    })
   }
 
   render() {
@@ -408,14 +424,12 @@ class ErrorBoundary extends Component<
       return (
         <div className="error-fallback">
           <h2>Something went wrong</h2>
-          <button onClick={() => window.location.reload()}>
-            Refresh page
-          </button>
+          <button onClick={() => window.location.reload()}>Refresh page</button>
         </div>
-      );
+      )
     }
 
-    return this.props.children;
+    return this.props.children
   }
 }
 ```
@@ -423,17 +437,20 @@ class ErrorBoundary extends Component<
 ## Results After Optimization
 
 ### Performance Improvements (10,000+ users):
+
 - **First Contentful Paint**: 2.1s → 0.8s (62% improvement)
 - **Largest Contentful Paint**: 3.8s → 1.4s (63% improvement)
 - **Bundle size**: 1.2MB → 340KB initial + 180KB per route (72% reduction)
 - **Time to Interactive**: 4.2s → 1.6s (62% improvement)
 
 ### User Experience Metrics:
+
 - **Bounce rate**: 65% → 23% (65% improvement)
 - **Session duration**: +140% increase
 - **User satisfaction score**: 6.2 → 8.7 (40% improvement)
 
 ### Business Impact:
+
 - **Conversion rate**: +85% increase
 - **Infrastructure costs**: 30% reduction due to efficient caching
 - **Support tickets**: 60% reduction in performance-related issues
@@ -446,42 +463,42 @@ For further scaling, we implemented a micro-frontend architecture:
 
 ```typescript
 // Module federation configuration
-const ModuleFederationPlugin = require('@module-federation/webpack');
+const ModuleFederationPlugin = require("@module-federation/webpack")
 
 module.exports = {
   plugins: [
     new ModuleFederationPlugin({
-      name: 'host',
+      name: "host",
       remotes: {
-        dashboard: 'dashboard@http://localhost:3001/remoteEntry.js',
-        reports: 'reports@http://localhost:3002/remoteEntry.js',
-        profile: 'profile@http://localhost:3003/remoteEntry.js',
+        dashboard: "dashboard@http://localhost:3001/remoteEntry.js",
+        reports: "reports@http://localhost:3002/remoteEntry.js",
+        profile: "profile@http://localhost:3003/remoteEntry.js",
       },
     }),
   ],
-};
+}
 ```
 
 ### CDN and Caching Strategy
 
 ```javascript
 // Service worker for aggressive caching
-self.addEventListener('fetch', (event) => {
-  if (event.request.destination === 'image') {
+self.addEventListener("fetch", (event) => {
+  if (event.request.destination === "image") {
     event.respondWith(
-      caches.open('images').then((cache) => {
+      caches.open("images").then((cache) => {
         return cache.match(event.request).then((response) => {
-          if (response) return response;
-          
+          if (response) return response
+
           return fetch(event.request).then((fetchResponse) => {
-            cache.put(event.request, fetchResponse.clone());
-            return fetchResponse;
-          });
-        });
-      })
-    );
+            cache.put(event.request, fetchResponse.clone())
+            return fetchResponse
+          })
+        })
+      }),
+    )
   }
-});
+})
 ```
 
 ## Lessons Learned

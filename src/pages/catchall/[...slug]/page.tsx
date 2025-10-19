@@ -1,4 +1,4 @@
-import type { PageProps } from "@/routes.types"
+import type { PageProps } from "@/routes"
 
 export function getStaticPath() {
   return [

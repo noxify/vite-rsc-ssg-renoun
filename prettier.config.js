@@ -10,10 +10,10 @@ const config = {
     "@ianvs/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss",
   ],
- tailwindStylesheet: fileURLToPath(
+  tailwindStylesheet: fileURLToPath(
     new URL("./src/styles.css", import.meta.url),
   ),
-  
+
   tailwindFunctions: ["cn", "cva"],
   importOrder: [
     "<TYPES>",

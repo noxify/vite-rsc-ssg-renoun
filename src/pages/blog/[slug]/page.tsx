@@ -1,3 +1,4 @@
+import type { PageProps } from "@/routes"
 import { BlogPostDirectory } from "@/collections"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
@@ -11,7 +12,7 @@ export async function getStaticPath() {
   return staticPaths.map((slug) => ({ slug }))
 }
 
-const getData = async (slug: string) => {
+const getData = async (slug: PageProps<"/blog/[slug]">["params"]["slug"]) => {
   const entry = await BlogPostDirectory.getFile(slug, "mdx")
 
   const frontmatter = await entry.getExportValue("frontmatter")
@@ -29,16 +30,12 @@ const getData = async (slug: string) => {
   return { frontmatter, formatter, tags, Content }
 }
 
-export default async function BlogPost({
-  params,
-}: {
-  params: { slug: string }
-}) {
+export default async function BlogPost({ params }: PageProps<"/blog/[slug]">) {
   const { frontmatter, formatter, tags, Content } = await getData(params.slug)
   return (
     <div className="container mx-auto px-4 py-16">
       <Button asChild variant="ghost" className="mb-8">
-        <a href="/blog/" className="flex items-center gap-2">
+        <a href="/blog/" className="items-center gap-2">
           <ArrowLeft size={16} />
           Back to articles
         </a>

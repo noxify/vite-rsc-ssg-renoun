@@ -17,23 +17,23 @@ As React applications grow in complexity, it becomes crucial to implement patter
 The compound component pattern allows you to create components that work together to form a complete UI element while maintaining flexibility in their composition.
 
 ```tsx path="components/Card/index.tsx"
-import React, { createContext, useContext } from 'react'
+import React, { createContext, useContext } from "react"
 
-const CardContext = createContext<{ variant?: 'primary' | 'secondary' }>({})
+const CardContext = createContext<{ variant?: "primary" | "secondary" }>({})
 
-export function Card({ children, variant = 'primary' }) {
+export function Card({ children, variant = "primary" }) {
   return (
     <CardContext.Provider value={{ variant }}>
-      <div className={`card card--${variant}`}>
-        {children}
-      </div>
+      <div className={`card card--${variant}`}>{children}</div>
     </CardContext.Provider>
   )
 }
 
 Card.Header = function CardHeader({ children }) {
   const { variant } = useContext(CardContext)
-  return <div className={`card__header card__header--${variant}`}>{children}</div>
+  return (
+    <div className={`card__header card__header--${variant}`}>{children}</div>
+  )
 }
 
 Card.Body = function CardBody({ children }) {
@@ -66,7 +66,7 @@ Usage example:
 Creating custom hooks for data fetching helps encapsulate loading states, error handling, and caching logic.
 
 ```tsx path="hooks/useApi.tsx"
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from "react"
 
 export function useApi<T>(url: string) {
   const [data, setData] = useState<T | null>(null)
@@ -78,11 +78,11 @@ export function useApi<T>(url: string) {
       try {
         setLoading(true)
         const response = await fetch(url)
-        if (!response.ok) throw new Error('Failed to fetch')
+        if (!response.ok) throw new Error("Failed to fetch")
         const result = await response.json()
         setData(result)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error')
+        setError(err instanceof Error ? err.message : "Unknown error")
       } finally {
         setLoading(false)
       }

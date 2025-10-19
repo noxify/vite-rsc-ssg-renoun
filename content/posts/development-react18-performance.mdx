@@ -17,13 +17,13 @@ React 18 introduced groundbreaking features that fundamentally change how we bui
 React 18's concurrent features allow you to mark updates as non-urgent, preventing them from blocking user interactions:
 
 ```tsx path="components/SearchResults.tsx"
-import { useState, useTransition, useDeferredValue } from 'react'
+import { useDeferredValue, useState, useTransition } from "react"
 
 export function SearchResults() {
-  const [query, setQuery] = useState('')
+  const [query, setQuery] = useState("")
   const [isPending, startTransition] = useTransition()
   const deferredQuery = useDeferredValue(query)
-  
+
   const handleSearch = (value: string) => {
     setQuery(value)
     // Mark expensive search as non-urgent
@@ -35,7 +35,7 @@ export function SearchResults() {
 
   return (
     <div>
-      <input 
+      <input
         value={query}
         onChange={(e) => handleSearch(e.target.value)}
         placeholder="Search..."
@@ -52,7 +52,7 @@ export function SearchResults() {
 React 18 automatically batches multiple state updates, even in promises and event handlers:
 
 ```tsx path="components/UserDashboard.tsx"
-import { useState } from 'react'
+import { useState } from "react"
 
 export function UserDashboard() {
   const [count, setCount] = useState(0)
@@ -61,13 +61,13 @@ export function UserDashboard() {
   const handleAsyncUpdate = async () => {
     // These updates are automatically batched in React 18
     setLoading(true)
-    setCount(prev => prev + 1)
-    
+    setCount((prev) => prev + 1)
+
     try {
-      await fetch('/api/update')
+      await fetch("/api/update")
       // These are also batched together
       setLoading(false)
-      setCount(prev => prev + 1)
+      setCount((prev) => prev + 1)
     } catch (error) {
       setLoading(false)
     }
@@ -77,7 +77,7 @@ export function UserDashboard() {
     <div>
       <p>Count: {count}</p>
       <button onClick={handleAsyncUpdate} disabled={loading}>
-        {loading ? 'Updating...' : 'Update'}
+        {loading ? "Updating..." : "Update"}
       </button>
     </div>
   )
@@ -89,8 +89,9 @@ export function UserDashboard() {
 Combine Suspense with error boundaries for robust loading states:
 
 ```tsx path="components/DataWrapper.tsx"
-import { Suspense } from 'react'
-import { ErrorBoundary } from './ErrorBoundary'
+import { Suspense } from "react"
+
+import { ErrorBoundary } from "./ErrorBoundary"
 
 function LoadingFallback() {
   return (
@@ -105,9 +106,7 @@ function ErrorFallback({ error }: { error: Error }) {
     <div className="error-message">
       <h2>Something went wrong</h2>
       <p>{error.message}</p>
-      <button onClick={() => window.location.reload()}>
-        Try again
-      </button>
+      <button onClick={() => window.location.reload()}>Try again</button>
     </div>
   )
 }
@@ -115,9 +114,7 @@ function ErrorFallback({ error }: { error: Error }) {
 export function DataWrapper({ children }: { children: React.ReactNode }) {
   return (
     <ErrorBoundary fallback={ErrorFallback}>
-      <Suspense fallback={<LoadingFallback />}>
-        {children}
-      </Suspense>
+      <Suspense fallback={<LoadingFallback />}>{children}</Suspense>
     </ErrorBoundary>
   )
 }
@@ -128,17 +125,17 @@ export function DataWrapper({ children }: { children: React.ReactNode }) {
 Safely subscribe to external stores with the new useSyncExternalStore hook:
 
 ```tsx path="hooks/useWindowSize.tsx"
-import { useSyncExternalStore } from 'react'
+import { useSyncExternalStore } from "react"
 
 function subscribe(callback: () => void) {
-  window.addEventListener('resize', callback)
-  return () => window.removeEventListener('resize', callback)
+  window.addEventListener("resize", callback)
+  return () => window.removeEventListener("resize", callback)
 }
 
 function getSnapshot() {
   return {
     width: window.innerWidth,
-    height: window.innerHeight
+    height: window.innerHeight,
   }
 }
 
@@ -146,7 +143,7 @@ export function useWindowSize() {
   return useSyncExternalStore(
     subscribe,
     getSnapshot,
-    () => ({ width: 0, height: 0 }) // Server snapshot
+    () => ({ width: 0, height: 0 }), // Server snapshot
   )
 }
 ```

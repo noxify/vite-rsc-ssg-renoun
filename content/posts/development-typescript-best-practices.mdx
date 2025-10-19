@@ -29,22 +29,18 @@ interface UserProfileProps {
   children?: React.ReactNode
 }
 
-export function UserProfile({ 
-  user, 
-  onEdit, 
-  className = '', 
-  children 
+export function UserProfile({
+  user,
+  onEdit,
+  className = "",
+  children,
 }: UserProfileProps) {
   return (
     <div className={`user-profile ${className}`}>
-      <img src={user.avatar || '/default-avatar.png'} alt={user.name} />
+      <img src={user.avatar || "/default-avatar.png"} alt={user.name} />
       <h2>{user.name}</h2>
       <p>{user.email}</p>
-      {onEdit && (
-        <button onClick={() => onEdit(user.id)}>
-          Edit Profile
-        </button>
-      )}
+      {onEdit && <button onClick={() => onEdit(user.id)}>Edit Profile</button>}
       {children}
     </div>
   )
@@ -64,12 +60,12 @@ interface DataListProps<T> {
   emptyMessage?: string
 }
 
-export function DataList<T>({ 
-  items, 
-  renderItem, 
-  keyExtractor, 
+export function DataList<T>({
+  items,
+  renderItem,
+  keyExtractor,
   loading = false,
-  emptyMessage = 'No items found'
+  emptyMessage = "No items found",
 }: DataListProps<T>) {
   if (loading) {
     return <div>Loading...</div>
@@ -82,9 +78,7 @@ export function DataList<T>({
   return (
     <ul className="data-list">
       {items.map((item, index) => (
-        <li key={keyExtractor(item)}>
-          {renderItem(item, index)}
-        </li>
+        <li key={keyExtractor(item)}>{renderItem(item, index)}</li>
       ))}
     </ul>
   )
@@ -96,13 +90,13 @@ export function DataList<T>({
 Use TypeScript to create strongly typed custom hooks:
 
 ```tsx path="hooks/useLocalStorage.tsx"
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from "react"
 
 type SetValue<T> = (value: T | ((prev: T) => T)) => void
 
 export function useLocalStorage<T>(
-  key: string, 
-  initialValue: T
+  key: string,
+  initialValue: T,
 ): [T, SetValue<T>] {
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
@@ -116,7 +110,8 @@ export function useLocalStorage<T>(
 
   const setValue: SetValue<T> = (value) => {
     try {
-      const valueToStore = value instanceof Function ? value(storedValue) : value
+      const valueToStore =
+        value instanceof Function ? value(storedValue) : value
       setStoredValue(valueToStore)
       window.localStorage.setItem(key, JSON.stringify(valueToStore))
     } catch (error) {

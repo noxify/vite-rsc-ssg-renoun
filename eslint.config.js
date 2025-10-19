@@ -3,7 +3,6 @@
 import * as path from "node:path"
 import { fixupPluginRules, includeIgnoreFile } from "@eslint/compat"
 import eslint from "@eslint/js"
-import nextPlugin from "@next/eslint-plugin-next"
 import importPlugin from "eslint-plugin-import-x"
 import packageJson from "eslint-plugin-package-json"
 import reactPlugin from "eslint-plugin-react"
@@ -101,18 +100,6 @@ export default tseslint.config(
       globals: {
         React: "writable",
       },
-    },
-  },
-  {
-    files: ["**/*.ts", "**/*.tsx"],
-    plugins: {
-      "@next/next": nextPlugin,
-    },
-    rules: {
-      ...nextPlugin.configs.recommended.rules,
-      ...nextPlugin.configs["core-web-vitals"].rules,
-      // TypeError: context.getAncestors is not a function
-      "@next/next/no-duplicate-head": "off",
     },
   },
 )

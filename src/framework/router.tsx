@@ -5,7 +5,7 @@ import { filePathToRoutePattern } from "./utils"
 /**
  * RouteEntry describes a single route, its pattern, page module, and layouts.
  */
-type RouteEntry = {
+interface RouteEntry {
   /** Path to the page file (e.g. './blog/page.tsx') */
   pagePath: string
   /** Route pattern (e.g. '/blog', '/blog/[slug]') */
@@ -70,27 +70,30 @@ function extractParams(
  * @param pathname - The route pattern (e.g. '/blog/hello')
  * @returns Array of imported layout modules (from root to leaf)
  */
-function collectLayouts(pathname: string) {
-  const layouts: any[] = []
+type LayoutComponent = React.ComponentType<{ children: React.ReactNode }>
+function collectLayouts(pathname: string): LayoutComponent[] {
+  const layouts: LayoutComponent[] = []
   let currentLayoutDir = "./"
   // Root layout
-  if (layoutModules[`${currentLayoutDir}layout.tsx`]) {
-    layouts.push(layoutModules[`${currentLayoutDir}layout.tsx`])
+  const rootLayout = layoutModules[`${currentLayoutDir}layout.tsx`]
+  if (rootLayout) {
+    layouts.push(rootLayout as LayoutComponent)
   }
   // Nested layouts (skip group folders)
-  let rawSegments = pathname
+  const rawSegments = pathname
     .replace(/^\/+|\/+$/g, "")
     .split("/")
     .filter(Boolean)
-  for (let i = 0; i < rawSegments.length; i++) {
-    if (/^\(.+\)$/.test(rawSegments[i])) continue // skip group
+  for (const segment of rawSegments) {
+    if (/^\(.+\)$/.test(segment)) continue // skip group
     currentLayoutDir =
       currentLayoutDir === "./"
-        ? `./${rawSegments[i]}/`
-        : `${currentLayoutDir}${rawSegments[i]}/`
+        ? `./${segment}/`
+        : `${currentLayoutDir}${segment}/`
     const key = currentLayoutDir + "layout.tsx"
-    if (layoutModules[key]) {
-      layouts.push(layoutModules[key])
+    const layout = layoutModules[key]
+    if (layout) {
+      layouts.push(layout as LayoutComponent)
     }
   }
   return layouts
@@ -148,22 +151,20 @@ export function AppRouter({ url }: { url: URL }) {
     }
     return route === pathname
   })
-  if (!match) {
-    // Try dynamic and catch-all route patterns
-    match = transformed.find((t) => {
-      let route = t.route
-      if (route.length > 1 && route.endsWith("/")) {
-        route = route.slice(0, -1)
-      }
-      const pattern =
-        "^" +
-        route
-          .replace(/\[\.\.\.(\w+)\]/g, "(.+)")
-          .replace(/\[(\w+)\]/g, "([^/]+)") +
-        "$"
-      return new RegExp(pattern).test(pathname)
-    })
-  }
+  // Try dynamic and catch-all route patterns
+  match ??= transformed.find((t) => {
+    let route = t.route
+    if (route.length > 1 && route.endsWith("/")) {
+      route = route.slice(0, -1)
+    }
+    const pattern =
+      "^" +
+      route
+        .replace(/\[\.\.\.(\w+)\]/g, "(.+)")
+        .replace(/\[(\w+)\]/g, "([^/]+)") +
+      "$"
+    return new RegExp(pattern).test(pathname)
+  })
   /**
    * If a match is found, extract params, render the page and wrap with layouts.
    * Otherwise, render a simple Not Found message.

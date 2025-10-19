@@ -23,6 +23,7 @@ git add -p filename.js
 ```
 
 This allows you to:
+
 - Stage specific hunks of changes
 - Split large changes into logical commits
 - Review each change before staging
@@ -54,6 +55,7 @@ git rebase -i HEAD~3
 ```
 
 Options during interactive rebase:
+
 - `pick` - keep the commit
 - `reword` - change commit message
 - `squash` - combine with previous commit
@@ -113,28 +115,28 @@ Add these to your `~/.gitconfig`:
 [alias]
     # Short status
     st = status -s
-    
+
     # Pretty log
     lg = log --oneline --decorate --graph --all
-    
+
     # Last commit
     last = log -1 HEAD --stat
-    
+
     # Unstage files
     unstage = reset HEAD --
-    
+
     # Show branches
     br = branch -a
-    
+
     # Quick commit
     cm = commit -m
-    
+
     # Amend last commit
     amend = commit --amend --no-edit
-    
+
     # Show current branch
     current = branch --show-current
-    
+
     # Delete merged branches
     cleanup = "!git branch --merged | grep -v '\\*\\|main\\|develop' | xargs -n 1 git branch -d"
 ```
@@ -281,6 +283,7 @@ fi
 1. **Use `.gitignore` templates**: GitHub provides excellent templates for different languages and frameworks.
 
 2. **Sign your commits**: Use GPG signing for verified commits:
+
    ```bash
    git config --global commit.gpgsign true
    ```
@@ -288,6 +291,7 @@ fi
 3. **Use conventional commits**: Follow the conventional commit format for better changelog generation.
 
 4. **Backup important branches**: Create backup branches before risky operations:
+
    ```bash
    git branch backup/feature-before-rebase
    ```
