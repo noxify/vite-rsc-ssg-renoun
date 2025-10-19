@@ -115,6 +115,7 @@ export function AppRouter({ url }: { url: URL }) {
    */
   type PageComponent = React.ComponentType<{
     params?: Record<string, string | string[]>
+    searchParams?: URLSearchParams
   }>
   /**
    * LayoutComponent expects children prop for nested rendering.
@@ -171,7 +172,7 @@ export function AppRouter({ url }: { url: URL }) {
     const params = extractParams(match.route, pathname)
     const Page = match.module as PageComponent
     let element = Object.keys(params).length ? (
-      <Page params={params} />
+      <Page params={params} searchParams={url.searchParams} />
     ) : (
       <Page />
     )

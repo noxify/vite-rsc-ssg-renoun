@@ -12,6 +12,7 @@ import remarkFrontmatter from "remark-frontmatter"
 import remarkMdxFrontmatter from "remark-mdx-frontmatter"
 import tsconfigPaths from "vite-tsconfig-paths"
 
+import RouteTypesPlugin from "./src/framework/route-types"
 import { RSC_POSTFIX } from "./src/framework/shared"
 import { printTreeView } from "./src/framework/utils"
 
@@ -29,6 +30,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    RouteTypesPlugin(),
     tsconfigPaths(),
     tailwindcss(),
     // inspect(),

@@ -1,3 +1,5 @@
+import type { PageProps } from "@/routes.types"
+
 export function getStaticPath() {
   return [
     { slug: ["level1"] },
@@ -8,9 +10,7 @@ export function getStaticPath() {
 
 export default function CatchAllPage({
   params,
-}: {
-  params: { slug: string[] }
-}) {
+}: PageProps<"/catchall/[...slug]">) {
   return (
     <div>
       <h2>Catch-All Route</h2>

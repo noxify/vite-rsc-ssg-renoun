@@ -51,6 +51,7 @@
     "vite-plugin-commonjs": "0.10.4",
     "serve-handler": "6.1.6",
     "@types/serve-handler": "6.1.4",
-    "tsx": "4.20.6"
+    "tsx": "4.20.6",
+    "tinyglobby": "0.2.15"
   }
 }
