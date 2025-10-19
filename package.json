@@ -11,7 +11,8 @@
     "format:fix": "prettier --check --write . --ignore-path .gitignore --ignore-path .prettierignore --cache --cache-location .cache/.prettiercache",
     "lint": "eslint --cache --cache-location .cache/.eslintcache",
     "lint:fix": "eslint --fix --cache --cache-location .cache/.eslintcache",
-    "preview": "tsx src/localserver.ts"
+    "preview": "tsx src/localserver.ts",
+    "typecheck": "tsc --noEmit"
   },
   "prettier": "./prettier.config.js",
   "dependencies": {
