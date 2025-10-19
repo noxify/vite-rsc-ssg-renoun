@@ -69,11 +69,14 @@ export default async function BlogPost({ params }: PageProps<"/blog/[slug]">) {
             <ul className="flex gap-2">
               {tags.map(({ label, slug }) => (
                 <li key={label} className="post__tag">
-                  <a href={`/tags/${slug}/`}>
-                    <span className="rounded-md bg-secondary px-2 py-1 hover:bg-primary hover:text-primary-foreground">
-                      {label}
-                    </span>
-                  </a>
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="font-mono"
+                  >
+                    <a href={`/tags/${slug}/`}>{label}</a>
+                  </Button>
                 </li>
               ))}
             </ul>

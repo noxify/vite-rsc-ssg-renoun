@@ -8,34 +8,17 @@
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
     "noEmit": true,
-    "lib": [
-      "ESNext",
-      "DOM",
-      "DOM.Iterable"
-    ],
-    "types": [
-      "vite/client",
-      "@vitejs/plugin-rsc/types"
-    ],
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "types": ["vite/client", "@vitejs/plugin-rsc/types"],
     "jsx": "react-jsx",
     "module": "esnext",
     "target": "ESNext",
     "moduleResolution": "bundler",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/routes": [
-        "./types/routes.d.ts"
-      ]
+      "@/*": ["./src/*"],
+      "@/routes": ["./types/routes.d.ts"]
     }
   },
-  "include": [
-    "src",
-    "vite.config.ts",
-    "types"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["src", "vite.config.ts", "types"],
+  "exclude": ["node_modules"]
 }

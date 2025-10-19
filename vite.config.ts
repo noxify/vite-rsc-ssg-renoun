@@ -16,8 +16,8 @@ import RouteTypesPlugin from "./src/framework/route-types"
 import { RSC_POSTFIX } from "./src/framework/shared"
 import { printTreeView } from "./src/framework/utils"
 
-export default defineConfig({
-  logLevel: "warn",
+export default defineConfig(({ command }) => ({
+  logLevel: command == "build" ? "warn" : "info",
   optimizeDeps: {
     exclude: ["renoun"],
   },
@@ -50,7 +50,7 @@ export default defineConfig({
     }),
     rscSsgPlugin(),
   ],
-})
+}))
 
 function rscSsgPlugin(): Plugin[] {
   return [
