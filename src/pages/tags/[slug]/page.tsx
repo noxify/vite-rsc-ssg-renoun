@@ -3,8 +3,7 @@ import { BlogCard } from "@/components/blog-card"
 
 export async function getStaticPath() {
   const staticPaths = await getTags()
-
-  return staticPaths
+  return staticPaths.map((tag) => ({ slug: tag }))
 }
 
 const getTags = async () => {

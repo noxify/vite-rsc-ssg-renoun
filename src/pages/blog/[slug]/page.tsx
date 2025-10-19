@@ -8,8 +8,7 @@ export async function getStaticPath() {
   const staticPaths = posts
     .map((post) => post.getPathnameSegments({ includeBasePathname: false }))
     .flat()
-
-  return staticPaths
+  return staticPaths.map((slug) => ({ slug }))
 }
 
 const getData = async (slug: string) => {

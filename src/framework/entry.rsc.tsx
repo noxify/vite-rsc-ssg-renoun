@@ -3,21 +3,44 @@ import { renderToReadableStream } from "@vitejs/plugin-rsc/rsc"
 import type { RscPayload } from "./shared"
 import { AppRouter } from "./router"
 import { RSC_POSTFIX } from "./shared"
-import { filePathToRoutePattern } from "./utils"
+import { filePathToRoutePattern, fillDynamicRoute } from "./utils"
 
 type MaybeAsync<T> = T | Promise<T>
 
+/**
+ * Generates static routes by processing dynamic route patterns and their corresponding static paths.
+ *
+ * This function scans for page.tsx files that export a `getStaticPath` function, extracts their
+ * route patterns, and generates concrete static routes by filling dynamic segments with actual values.
+ *
+ * @returns A promise that resolves to an object containing:
+ *   - `generated`: Array of all generated static route paths with trailing slashes
+ *   - `tree`: Object mapping route patterns to their generated paths (only for dynamic routes)
+ *
+ * @example
+ * ```typescript
+ * const result = await getStaticRoutes();
+ * // result.generated: ["/", "/blog/", "/blog/post-1/", "/blog/post-2/"]
+ * // result.tree: { "/blog/[slug]": ["/blog/post-1/", "/blog/post-2/"] }
+ * ```
+ *
+ * @remarks
+ * - Supports both regular dynamic segments `[param]` and catch-all segments `[...param]`
+ * - Automatically adds trailing slashes to all routes except the root route "/"
+ * - Handles both synchronous and asynchronous `getStaticPath` functions
+ * - Falls back to using 'slug' as parameter name for legacy string-based static paths
+ */
 export async function getStaticRoutes() {
   const staticPathModules = import.meta.glob("/**/page.tsx", {
     eager: true,
     base: "/src/pages/",
     import: "getStaticPath",
-  }) as Record<string, MaybeAsync<() => string[]>>
+  }) as Record<string, MaybeAsync<() => Array<Record<string, any>>>>
 
   const transformed = await Promise.all(
     Object.entries(staticPathModules).map(async ([pagePath, staticPaths]) => {
       const route = filePathToRoutePattern(pagePath, "./")
-      let staticPathsFn: (() => string[]) | undefined
+      let staticPathsFn: (() => Array<Record<string, any>>) | undefined
       if (typeof staticPaths === "function") {
         staticPathsFn = staticPaths
       } else if (staticPaths && typeof staticPaths.then === "function") {
@@ -44,23 +67,15 @@ export async function getStaticRoutes() {
     const generated: string[] = []
     for (const p of staticPaths) {
       let finalPath = ""
-      if (Array.isArray(p)) {
-        if (p.length === 0) {
-          finalPath = route === "/" ? "/" : route.replace(/\/$/, "")
-        } else {
-          finalPath = [route.replace(/\[\.\.\..*?\]/, ""), ...p]
-            .join("/")
-            .replace(/\/+/g, "/")
-            .replace(/\/$/, "")
-        }
+      if (typeof p === "object" && p !== null) {
+        finalPath = fillDynamicRoute(route, p)
       } else if (p === "/" || p === "") {
         finalPath = route === "/" ? "/" : route.replace(/\/$/, "")
       } else {
-        finalPath = [route.replace(/\[.*?\]/g, ""), p]
-          .join("/")
-          .replace(/\/+/g, "/")
-          .replace(/\/$/, "")
+        // fallback for legacy string param
+        finalPath = fillDynamicRoute(route, { slug: p })
       }
+
       if (finalPath !== "/" && !finalPath.endsWith("/")) {
         finalPath += "/"
       }

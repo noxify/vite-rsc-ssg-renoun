@@ -68,7 +68,6 @@ function rscSsgPlugin(): Plugin[] {
       buildApp: {
         async handler(builder) {
           await renderStatic(builder.config)
-          console.log("RSC SSG: Static rendering complete.")
           process.exit(0)
         },
       },
@@ -99,7 +98,7 @@ async function renderStatic(config: ResolvedConfig) {
     await writeFileStream(path.join(baseDir, staticPatch + RSC_POSTFIX), rsc)
   }
 
-  console.log(printTreeView(staticPaths.tree, 5))
+  printTreeView(staticPaths.tree)
 }
 
 async function writeFileStream(filePath: string, stream: ReadableStream) {

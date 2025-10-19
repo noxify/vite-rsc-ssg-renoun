@@ -36,6 +36,42 @@ export function filePathToRoutePattern(
   return pattern
 }
 
+/**
+ * Fills a dynamic route template with the provided parameters.
+ *
+ * Replaces dynamic segments in a route string with actual values from the params object.
+ * Supports both regular dynamic segments `[param]` and catch-all segments `[...param]`.
+ *
+ * @param route - The route template string containing dynamic segments in brackets (e.g., "/users/[id]" or "/posts/[...slug]")
+ * @param params - Record containing the parameter values to fill into the route
+ * @returns The route string with dynamic segments replaced by actual parameter values
+ *
+ * @example
+ * ```typescript
+ * // Regular dynamic segment
+ * fillDynamicRoute("/users/[id]", { id: "123" })
+ * // Returns: "/users/123"
+ *
+ * // Catch-all segment
+ * fillDynamicRoute("/docs/[...path]", { path: ["api", "users", "create"] })
+ * // Returns: "/docs/api/users/create"
+ * ```
+ */
+export function fillDynamicRoute(
+  route: string,
+  params: Record<string, any>,
+): string {
+  return route.replace(/\[(\.\.\.[^\]]+|[^\]]+)\]/g, (_match, paramName) => {
+    if (paramName.startsWith("...")) {
+      // Catch-all: join all segments in array
+      const key = paramName.slice(3)
+      const value = params[key]
+      return Array.isArray(value) ? value.join("/") : (value ?? "")
+    }
+    return params[paramName] ?? ""
+  })
+}
+
 type TreeView = Record<string, string[]>
 
 export function printTreeView(tree: TreeView, maxChildren: number = 3): void {
