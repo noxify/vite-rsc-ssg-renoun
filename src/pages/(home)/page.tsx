@@ -3,7 +3,7 @@ import { BlogCard } from "@/components/blog-card"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 
-export function getStaticPath() {
+export function generateStaticParams() {
   return ["/"]
 }
 

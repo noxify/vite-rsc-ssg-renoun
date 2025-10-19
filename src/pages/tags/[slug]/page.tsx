@@ -2,7 +2,7 @@ import type { PageProps } from "@/routes"
 import { BlogPostDirectory } from "@/collections"
 import { BlogCard } from "@/components/blog-card"
 
-export async function getStaticPath() {
+export async function generateStaticParams() {
   const staticPaths = await getTags()
   return staticPaths.map((tag) => ({ slug: tag }))
 }

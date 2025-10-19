@@ -1,7 +1,7 @@
 import { BlogPostDirectory } from "@/collections"
 import { BlogCard } from "@/components/blog-card"
 
-export function getStaticPath() {
+export function generateStaticParams() {
   return ["/"]
 }
 

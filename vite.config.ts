@@ -84,7 +84,7 @@ async function renderStatic(config: ResolvedConfig) {
     entryPath
   )
 
-  // get static paths from all pages based on their `getStaticPaths` export
+  // get static paths from all pages based on their `generateStaticParamss` export
   const staticPaths = await entry.getStaticRoutes()
 
   // render rsc and html

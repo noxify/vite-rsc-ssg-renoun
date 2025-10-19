@@ -1,6 +1,6 @@
 import type { PageProps } from "@/routes"
 
-export function getStaticPath() {
+export function generateStaticParams() {
   return [
     { slug: ["level1"] },
     { slug: ["level1", "level2"] },

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { createSlug } from "renoun"
 
-export async function getStaticPath() {
+export async function generateStaticParams() {
   const posts = await BlogPostDirectory.getEntries()
   const staticPaths = posts
     .map((post) => post.getPathnameSegments({ includeBasePathname: false }))

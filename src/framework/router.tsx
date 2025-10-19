@@ -70,7 +70,11 @@ function extractParams(
  * @param pathname - The route pattern (e.g. '/blog/hello')
  * @returns Array of imported layout modules (from root to leaf)
  */
-type LayoutComponent = React.ComponentType<{ children: React.ReactNode }>
+type LayoutComponent = React.ComponentType<{
+  children: React.ReactNode
+  params?: Record<string, string | string[]>
+  searchParams?: URLSearchParams
+}>
 function collectLayouts(pathname: string): LayoutComponent[] {
   const layouts: LayoutComponent[] = []
   let currentLayoutDir = "./"
@@ -123,7 +127,11 @@ export function AppRouter({ url }: { url: URL }) {
   /**
    * LayoutComponent expects children prop for nested rendering.
    */
-  type LayoutComponent = React.ComponentType<{ children: React.ReactNode }>
+  type LayoutComponent = React.ComponentType<{
+    children: React.ReactNode
+    params?: Record<string, string | string[]>
+    searchParams?: URLSearchParams
+  }>
 
   /**
    * transformed: Array of all routes with their page and layouts.
@@ -179,7 +187,11 @@ export function AppRouter({ url }: { url: URL }) {
     )
     for (let i = match.layouts.length - 1; i >= 0; i--) {
       const Layout = match.layouts[i] as LayoutComponent
-      element = <Layout>{element}</Layout>
+      element = (
+        <Layout params={params} searchParams={url.searchParams}>
+          {element}
+        </Layout>
+      )
     }
     return element
   }

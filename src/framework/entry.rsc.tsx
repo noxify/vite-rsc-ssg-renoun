@@ -16,7 +16,7 @@ function isPromise<T>(value: unknown): value is Promise<T> {
 /**
  * Generates static routes by processing dynamic route patterns and their corresponding static paths.
  *
- * This function scans for page.tsx files that export a `getStaticPath` function, extracts their
+ * This function scans for page.tsx files that export a `generateStaticParams` function, extracts their
  * route patterns, and generates concrete static routes by filling dynamic segments with actual values.
  *
  * @returns A promise that resolves to an object containing:
@@ -33,14 +33,14 @@ function isPromise<T>(value: unknown): value is Promise<T> {
  * @remarks
  * - Supports both regular dynamic segments `[param]` and catch-all segments `[...param]`
  * - Automatically adds trailing slashes to all routes except the root route "/"
- * - Handles both synchronous and asynchronous `getStaticPath` functions
+ * - Handles both synchronous and asynchronous `generateStaticParams` functions
  * - Falls back to using 'slug' as parameter name for legacy string-based static paths
  */
 export async function getStaticRoutes() {
   const staticPathModules = import.meta.glob("/**/page.tsx", {
     eager: true,
     base: "/src/pages/",
-    import: "getStaticPath",
+    import: "generateStaticParams",
   })
 
   const transformed = await Promise.all(
